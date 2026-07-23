@@ -65,13 +65,18 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
   }
 
   if (interaction.isButton()) {
-    const { handleTicketClose, handleTicketClaim, handleTicketOpen } = require("./commands/ticket");
+    const { handleTicketClose, handleTicketClaim } = require("./commands/ticket");
     if (interaction.customId.startsWith("ticket_close_")) {
       await handleTicketClose(interaction);
     } else if (interaction.customId.startsWith("ticket_claim_")) {
       await handleTicketClaim(interaction);
-    } else if (interaction.customId.startsWith("ticket_open_")) {
-      const ticketType = interaction.customId.replace("ticket_open_", "");
+    }
+  }
+
+  if (interaction.isStringSelectMenu()) {
+    if (interaction.customId === "ticket_select") {
+      const { handleTicketOpen } = require("./commands/ticket");
+      const ticketType = interaction.values[0];
       await handleTicketOpen(interaction, ticketType);
     }
   }

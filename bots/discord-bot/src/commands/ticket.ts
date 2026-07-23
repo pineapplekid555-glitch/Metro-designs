@@ -4,6 +4,8 @@ import {
   ButtonBuilder,
   ButtonStyle,
   ActionRowBuilder,
+  StringSelectMenuBuilder,
+  StringSelectMenuInteraction,
   PermissionFlagsBits,
   ChannelType,
   ChatInputCommandInteraction,
@@ -178,7 +180,7 @@ const command: BotCommand = {
       const embed = new EmbedBuilder()
         .setTitle("🎫 Metro Designs — Support & Commissions")
         .setDescription(
-          "Welcome! Click the button below that best fits your request and a private ticket will be created just for you.\n\n" +
+          "Welcome! Select a ticket category from the dropdown below and a private ticket will be created just for you.\n\n" +
             Object.values(TICKET_TYPES)
               .map((t) => `${t.emoji} **${t.label}** — ${t.description}`)
               .join("\n")
@@ -187,32 +189,21 @@ const command: BotCommand = {
         .setFooter({ text: "Metro Designs • One ticket per type at a time" })
         .setTimestamp();
 
-      // Split buttons across rows (max 5 per row)
-      const typeKeys = Object.keys(TICKET_TYPES);
-      const row1 = new ActionRowBuilder<ButtonBuilder>().addComponents(
-        ...typeKeys.slice(0, 3).map((key) => {
-          const t = TICKET_TYPES[key];
-          return new ButtonBuilder()
-            .setCustomId(`ticket_open_${key}`)
-            .setLabel(t.label)
-            .setEmoji(t.emoji)
-            .setStyle(ButtonStyle.Primary);
-        })
-      );
-      const row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
-        ...typeKeys.slice(3).map((key) => {
-          const t = TICKET_TYPES[key];
-          return new ButtonBuilder()
-            .setCustomId(`ticket_open_${key}`)
-            .setLabel(t.label)
-            .setEmoji(t.emoji)
-            .setStyle(
-              key === "report" ? ButtonStyle.Danger : ButtonStyle.Secondary
-            );
-        })
-      );
+      const menu = new StringSelectMenuBuilder()
+        .setCustomId("ticket_select")
+        .setPlaceholder("📂 Select a ticket category...")
+        .addOptions(
+          Object.entries(TICKET_TYPES).map(([key, t]) => ({
+            label: t.label,
+            value: key,
+            description: t.description,
+            emoji: t.emoji,
+          }))
+        );
 
-      await targetChannel.send({ embeds: [embed], components: [row1, row2] });
+      const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu);
+
+      await targetChannel.send({ embeds: [embed], components: [row] });
       await interaction.reply({
         content: `✅ Ticket panel posted in ${targetChannel}.`,
         ephemeral: true,
@@ -518,10 +509,10 @@ export async function handleTicketClaim(interaction: ButtonInteraction) {
   await interaction.reply({ content: `✋ ${member} has claimed this ticket!` });
 }
 
-export async function handleTicketOpen(interaction: ButtonInteraction, ticketType: string) {
+export async function handleTicketOpen(interaction: ButtonInteraction | StringSelectMenuInteraction, ticketType: string) {
   await interaction.deferReply({ ephemeral: true });
   const member = interaction.member as GuildMember;
-  const channel = await createTicket(interaction, member, ticketType);
+  const channel = await createTicket(interaction as unknown as ButtonInteraction, member, ticketType);
   if (channel) {
     await interaction.editReply({ content: `✅ Your **${TICKET_TYPES[ticketType]?.label ?? ticketType}** ticket has been created: ${channel}` });
   }
