@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["nodejs_20"]
+
+[phases.install]
+cmds = ["npm install -g pnpm@latest", "cd bots/discord-bot && pnpm install --no-frozen-lockfile"]
+
+[phases.build]
+cmds = ["cd bots/discord-bot && pnpm run build"]
+
+[start]
+cmd = "cd bots/discord-bot && node dist/index.js"
