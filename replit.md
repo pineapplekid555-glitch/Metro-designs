@@ -1,36 +1,52 @@
-# [Project name]
+# Metro Designs Discord Bot
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A full-featured Discord commissions bot for the Metro Designs Roblox GFX server.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/discord-bot run dev` — run the bot in dev mode (with auto-restart)
+- `pnpm --filter @workspace/discord-bot run deploy` — register slash commands with Discord
 - `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- Required env: `DISCORD_TOKEN` — Discord bot token (set as a Replit Secret)
+- Required env: `CLIENT_ID` — Discord application/client ID
+- Optional env: `GUILD_ID` — Guild ID for instant command registration (dev only)
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- Discord: discord.js v14
+- Persistence: JSON file storage in `bots/discord-bot/data/`
+- API: Express 5 (shared api-server, not used by bot)
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `bots/discord-bot/src/commands/` — all slash commands
+- `bots/discord-bot/src/events/` — event handlers (welcome, etc.)
+- `bots/discord-bot/src/data/store.ts` — JSON read/write helpers
+- `bots/discord-bot/data/` — persistent JSON data files (gitignored)
+
+## Bot Features
+
+| Command | Purpose |
+|---|---|
+| `/tax charge/receive` | Roblox 30% tax calculator |
+| `/ticket open/close/setup/add/remove` | Commission ticket system |
+| `/dm` | DM a user as the bot |
+| `/status set/view/list` | Commission status tracker |
+| `/pricelist view/add/remove` | Commission price list |
+| `/review leave/list` | Review system |
+| `/queue view/add/remove/next/check` | Commission queue |
+| `/blacklist add/remove/check/list` | Blacklist system |
+| `/announce` | Post announcements |
+| `/rules show/add/remove` | Server rules |
+| `/welcome setup/message/toggle/preview` | Welcome system |
+| `/partner add/remove/list/info/setup` | Server partnerships |
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
-
-## Product
-
-_Describe the high-level user-facing capabilities of this app once they exist._
+- All persistent data stored in JSON files under `bots/discord-bot/data/` — survives bot restarts and code updates without a database.
+- Ticket system config is persisted so `/ticket setup` only needs to be run once.
+- Bot uses discord.js v14 slash commands (interaction-based, no prefix commands).
 
 ## User preferences
 
@@ -38,8 +54,7 @@ _Populate as you build — explicit user instructions worth remembering across s
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
-
-## Pointers
-
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- Always run `/ticket setup` and `/welcome setup` after first invite.
+- Run `pnpm --filter @workspace/discord-bot run deploy` after adding new commands.
+- `GUILD_ID` env var enables instant (guild-scoped) command registration — useful in dev. Remove for production global registration.
+- Data files in `data/*.json` are gitignored to keep server data private.
