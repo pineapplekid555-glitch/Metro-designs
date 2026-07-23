@@ -35,45 +35,37 @@ export const TICKET_TYPES: Record<
   string,
   { label: string; emoji: string; description: string; color: number; fields: string }
 > = {
-  commission: {
-    label: "Commission Request",
-    emoji: "🎨",
-    description: "Request a new commission from Metro Designs.",
+  livery: {
+    label: "Livery",
+    emoji: "🚗",
+    description: "Commission a custom vehicle livery/texture.",
     color: 0x5865f2,
     fields:
-      "• Type of commission (GFX, UI, logo, etc.)\n• Budget (in Robux)\n• Deadline\n• Reference images / examples",
+      "• Vehicle name / model\n• Color scheme & any references\n• Budget (in Robux)\n• Deadline",
   },
-  revision: {
-    label: "Revision Request",
-    emoji: "✏️",
-    description: "Request changes to an existing commission.",
-    color: 0xfee75c,
-    fields:
-      "• Your original ticket number\n• What needs to be changed\n• Any new references",
-  },
-  support: {
-    label: "General Support",
-    emoji: "💬",
-    description: "Questions, payment issues, or general help.",
-    color: 0x57f287,
-    fields:
-      "• What do you need help with?\n• Any relevant screenshots or context",
-  },
-  partnership: {
-    label: "Partnership",
-    emoji: "🤝",
-    description: "Apply for a server partnership with Metro Designs.",
-    color: 0xeb459e,
-    fields:
-      "• Server name & invite link\n• Member count\n• What you offer in return",
-  },
-  report: {
-    label: "Report a User",
+  els: {
+    label: "ELS",
     emoji: "🚨",
-    description: "Report a scammer, harasser, or rule-breaker.",
+    description: "Commission an Emergency Lighting System (ELS) config.",
     color: 0xed4245,
     fields:
-      "• User's Discord tag / ID\n• What happened\n• Evidence (screenshots, messages)",
+      "• Vehicle name / model\n• Light pattern preferences\n• Any references or examples\n• Budget (in Robux)\n• Deadline",
+  },
+  discord: {
+    label: "Discord Server",
+    emoji: "💬",
+    description: "Commission a Discord server setup or branding package.",
+    color: 0x57f287,
+    fields:
+      "• What you need (setup, branding, bots, etc.)\n• Server theme / purpose\n• Budget (in Robux)\n• Deadline\n• Any reference servers",
+  },
+  uniform: {
+    label: "Uniform",
+    emoji: "👔",
+    description: "Commission a custom uniform or clothing design.",
+    color: 0xfee75c,
+    fields:
+      "• Uniform type (shirt, pants, full outfit)\n• Color scheme & logo/patch details\n• Reference images\n• Budget (in Robux)\n• Deadline",
   },
 };
 
@@ -110,11 +102,10 @@ const command: BotCommand = {
             .setDescription("Type of ticket")
             .setRequired(false)
             .addChoices(
-              { name: "🎨 Commission Request", value: "commission" },
-              { name: "✏️ Revision Request", value: "revision" },
-              { name: "💬 General Support", value: "support" },
-              { name: "🤝 Partnership", value: "partnership" },
-              { name: "🚨 Report a User", value: "report" }
+              { name: "🚗 Livery", value: "livery" },
+              { name: "🚨 ELS", value: "els" },
+              { name: "💬 Discord Server", value: "discord" },
+              { name: "👔 Uniform", value: "uniform" }
             )
         )
         .addStringOption((opt) =>
